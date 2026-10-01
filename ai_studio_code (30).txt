@@ -1,0 +1,82 @@
+import SwiftUI
+
+public struct MiniPlayerView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @Binding var isPlayerPresented: Bool
+    
+    public var body: some View {
+        if let track = audioService.currentTrack {
+            VStack(spacing: 0) {
+                HStack(spacing: 12) {
+                    AsyncImage(url: URL(string: track.coverUrl)) { img in
+                        img.resizable().aspectRatio(contentMode: .fill)
+                    } placeholder: {
+                        Rectangle().fill(Color.gray.opacity(0.3))
+                    }
+                    .frame(width: 44, height: 44)
+                    .cornerRadius(8)
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(track.title)
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                            .lineLimit(1)
+                        Text(track.artistString)
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                            .lineLimit(1)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: { audioService.togglePlayPause() }) {
+                        if audioService.isLoading {
+                            ProgressView()
+                                .progressViewStyle(CircularProgressViewStyle(tint: .cyan))
+                                .frame(width: 32, height: 32)
+                        } else {
+                            Image(systemName: audioService.isPlaying ? "pause.fill" : "play.fill")
+                                .font(.system(size: 18))
+                                .foregroundColor(.white)
+                                .frame(width: 36, height: 36)
+                        }
+                    }
+                    
+                    Button(action: { audioService.playNext() }) {
+                        Image(systemName: "forward.fill")
+                            .font(.system(size: 16))
+                            .foregroundColor(.gray)
+                            .frame(width: 32, height: 32)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                
+                GeometryReader { geo in
+                    let progress = audioService.duration > 0 ? (audioService.currentTime / audioService.duration) : 0
+                    ZStack(alignment: .leading) {
+                        Rectangle().fill(Color.white.opacity(0.1)).frame(height: 2)
+                        Rectangle()
+                            .fill(LinearGradient(
+                                colors: [Color(red: 0.0, green: 0.82, blue: 1.0), Color(red: 0.15, green: 0.39, blue: 0.92), Color(red: 0.58, green: 0.36, blue: 0.96)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            ))
+                            .frame(width: geo.size.width * CGFloat(progress), height: 2)
+                    }
+                }
+                .frame(height: 2)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color(red: 0.04, green: 0.07, blue: 0.13).opacity(0.96))
+                    .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.cyan.opacity(0.2), lineWidth: 1))
+                    .shadow(color: Color.black.opacity(0.6), radius: 14, y: 4)
+            )
+            .padding(.horizontal, 8)
+            .onTapGesture {
+                isPlayerPresented = true
+            }
+        }
+    }
+}

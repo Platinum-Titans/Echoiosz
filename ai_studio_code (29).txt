@@ -1,0 +1,61 @@
+import SwiftUI
+
+public struct MainTabView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @EnvironmentObject var offlineCache: OfflineCacheManager
+    @State private var selectedTab: Int = 0
+    @State private var isPlayerPresented: Bool = false
+    
+    public init() {}
+    
+    public var body: some View {
+        ZStack(alignment: .bottom) {
+            TabView(selection: $selectedTab) {
+                HomeFeedView()
+                    .tabItem {
+                        Image(systemName: "house.fill")
+                        Text("Home")
+                    }
+                    .tag(0)
+                
+                ExploreSearchView()
+                    .tabItem {
+                        Image(systemName: "safari.fill")
+                        Text("Explore")
+                    }
+                    .tag(1)
+                
+                LibraryView()
+                    .tabItem {
+                        Image(systemName: "books.vertical.fill")
+                        Text("Library")
+                    }
+                    .tag(2)
+                
+                DownloadsView()
+                    .tabItem {
+                        Image(systemName: "arrow.down.circle.fill")
+                        Text("Downloads")
+                    }
+                    .badge(offlineCache.cachedRecords.count > 0 ? "\(offlineCache.cachedRecords.count)" : nil)
+                    .tag(3)
+                
+                ExtensionsView()
+                    .tabItem {
+                        Image(systemName: "puzzlepiece.fill")
+                        Text("Extensions")
+                    }
+                    .tag(4)
+            }
+            .accentColor(Color.cyan)
+            
+            if audioService.currentTrack != nil {
+                MiniPlayerView(isPlayerPresented: $isPlayerPresented)
+                    .padding(.bottom, 54)
+            }
+        }
+        .fullScreenCover(isPresented: $isPlayerPresented) {
+            PlayerView(isPresented: $isPlayerPresented)
+        }
+    }
+}

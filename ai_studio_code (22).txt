@@ -1,0 +1,136 @@
+import Foundation
+
+public struct Track: Identifiable, Codable, Equatable, Hashable {
+    public let id: String
+    public let title: String
+    public let artists: [String]
+    public let album: String?
+    public let duration: TimeInterval
+    public let coverUrl: String
+    public let streamUrl: String?
+    public let youtubeId: String?
+    public let extensionId: String
+    public let format: String?
+    public var lyrics: SyncedLyrics?
+    
+    public init(
+        id: String,
+        title: String,
+        artists: [String],
+        album: String? = nil,
+        duration: TimeInterval,
+        coverUrl: String,
+        streamUrl: String? = nil,
+        youtubeId: String? = nil,
+        extensionId: String = "local-mock",
+        format: String? = "AAC 256kbps",
+        lyrics: SyncedLyrics? = nil
+    ) {
+        self.id = id
+        self.title = title
+        self.artists = artists
+        self.album = album
+        self.duration = duration
+        self.coverUrl = coverUrl
+        self.streamUrl = streamUrl
+        self.youtubeId = youtubeId
+        self.extensionId = extensionId
+        self.format = format
+        self.lyrics = lyrics
+    }
+    
+    public var artistString: String {
+        artists.joined(separator: ", ")
+    }
+    
+    public var formattedDuration: String {
+        let mins = Int(duration) / 60
+        let secs = Int(duration) % 60
+        return String(format: "%d:%02d", mins, secs)
+    }
+}
+
+public struct SyncedLyrics: Codable, Equatable, Hashable {
+    public let lines: [LyricLine]
+    public let source: String?
+    
+    public init(lines: [LyricLine], source: String? = nil) {
+        self.lines = lines
+        self.source = source
+    }
+}
+
+public struct LyricLine: Identifiable, Codable, Equatable, Hashable {
+    public var id: String { "\(timeMs)-\(text)" }
+    public let timeMs: Int
+    public let text: String
+    
+    public init(timeMs: Int, text: String) {
+        self.timeMs = timeMs
+        self.text = text
+    }
+    
+    public var timeSeconds: TimeInterval {
+        TimeInterval(timeMs) / 1000.0
+    }
+}
+
+public struct Artist: Identifiable, Codable, Equatable, Hashable {
+    public let id: String
+    public let name: String
+    public let avatarUrl: String
+    public let subscribers: String?
+    
+    public init(id: String, name: String, avatarUrl: String, subscribers: String? = nil) {
+        self.id = id
+        self.name = name
+        self.avatarUrl = avatarUrl
+        self.subscribers = subscribers
+    }
+}
+
+public struct Album: Identifiable, Codable, Equatable, Hashable {
+    public let id: String
+    public let title: String
+    public let artists: [String]
+    public let year: String
+    public let coverUrl: String
+    public let tracksCount: Int?
+    
+    public init(id: String, title: String, artists: [String], year: String, coverUrl: String, tracksCount: Int? = nil) {
+        self.id = id
+        self.title = title
+        self.artists = artists
+        self.year = year
+        self.coverUrl = coverUrl
+        self.tracksCount = tracksCount
+    }
+}
+
+public struct Playlist: Identifiable, Codable, Equatable {
+    public let id: String
+    public var name: String
+    public var trackIds: [String]
+    public let createdAt: Date
+    
+    public init(id: String = UUID().uuidString, name: String, trackIds: [String] = [], createdAt: Date = Date()) {
+        self.id = id
+        self.name = name
+        self.trackIds = trackIds
+        self.createdAt = createdAt
+    }
+}
+
+public struct Shelf: Identifiable, Codable, Equatable {
+    public let id: String
+    public let title: String
+    public let subtitle: String?
+    public let tracks: [Track]
+    
+    public init(id: String, title: String, subtitle: String? = nil, tracks: [Track]) {
+        self.id = id
+        self.title = title
+        self.subtitle = subtitle
+        self.tracks = tracks
+    }
+}

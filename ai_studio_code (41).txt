@@ -1,0 +1,396 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 54;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA1000012A00000000000001 /* EchoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000012A00000000000001 /* EchoApp.swift */; };
+		AA1000022A00000000000002 /* Track.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000022A00000000000002 /* Track.swift */; };
+		AA1000032A00000000000003 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000032A00000000000003 /* Extension.swift */; };
+		AA1000042A00000000000004 /* AudioPlayerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000042A00000000000004 /* AudioPlayerService.swift */; };
+		AA1000052A00000000000005 /* ExtensionEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000052A00000000000005 /* ExtensionEngine.swift */; };
+		AA1000062A00000000000006 /* OfflineCacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000062A00000000000006 /* OfflineCacheManager.swift */; };
+		AA1000072A00000000000007 /* LyricsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000072A00000000000007 /* LyricsService.swift */; };
+		AA1000082A00000000000008 /* LibraryService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000082A00000000000008 /* LibraryService.swift */; };
+		AA1000092A00000000000009 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000092A00000000000009 /* MainTabView.swift */; };
+		AA10000A2A0000000000000A /* MiniPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20000A2A0000000000000A /* MiniPlayerView.swift */; };
+		AA10000B2A0000000000000B /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20000B2A0000000000000B /* PlayerView.swift */; };
+		AA10000C2A0000000000000C /* HomeFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20000C2A0000000000000C /* HomeFeedView.swift */; };
+		AA10000D2A0000000000000D /* ExploreSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20000D2A0000000000000D /* ExploreSearchView.swift */; };
+		AA10000E2A0000000000000E /* LibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20000E2A0000000000000E /* LibraryView.swift */; };
+		AA10000F2A0000000000000F /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA20000F2A0000000000000F /* DownloadsView.swift */; };
+		AA1000102A00000000000010 /* ExtensionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA2000102A00000000000010 /* ExtensionsView.swift */; };
+		AA1000112A00000000000011 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA2000112A00000000000011 /* Assets.xcassets */; };
+		AA1000122A00000000000012 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA2000122A00000000000012 /* LaunchScreen.storyboard */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		AA3000012A00000000000001 /* Echo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Echo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA2000012A00000000000001 /* EchoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoApp.swift; sourceTree = "<group>"; };
+		AA2000022A00000000000002 /* Track.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Track.swift; sourceTree = "<group>"; };
+		AA2000032A00000000000003 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
+		AA2000042A00000000000004 /* AudioPlayerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPlayerService.swift; sourceTree = "<group>"; };
+		AA2000052A00000000000005 /* ExtensionEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionEngine.swift; sourceTree = "<group>"; };
+		AA2000062A00000000000006 /* OfflineCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineCacheManager.swift; sourceTree = "<group>"; };
+		AA2000072A00000000000007 /* LyricsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LyricsService.swift; sourceTree = "<group>"; };
+		AA2000082A00000000000008 /* LibraryService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryService.swift; sourceTree = "<group>"; };
+		AA2000092A00000000000009 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		AA20000A2A0000000000000A /* MiniPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiniPlayerView.swift; sourceTree = "<group>"; };
+		AA20000B2A0000000000000B /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		AA20000C2A0000000000000C /* HomeFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeFeedView.swift; sourceTree = "<group>"; };
+		AA20000D2A0000000000000D /* ExploreSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExploreSearchView.swift; sourceTree = "<group>"; };
+		AA20000E2A0000000000000E /* LibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryView.swift; sourceTree = "<group>"; };
+		AA20000F2A0000000000000F /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
+		AA2000102A00000000000010 /* ExtensionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtensionsView.swift; sourceTree = "<group>"; };
+		AA2000112A00000000000011 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AA2000122A00000000000012 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		AA2000132A00000000000013 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA2000142A00000000000014 /* Echo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Echo.entitlements; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AA4000012A00000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AA5000012A00000000000001 = {
+			isa = PBXGroup;
+			children = (
+				AA5000022A00000000000002 /* Echo */,
+				AA5000082A00000000000008 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AA5000022A00000000000002 /* Echo */ = {
+			isa = PBXGroup;
+			children = (
+				AA5000032A00000000000003 /* App */,
+				AA5000042A00000000000004 /* Models */,
+				AA5000052A00000000000005 /* Services */,
+				AA5000062A00000000000006 /* Views */,
+				AA5000072A00000000000007 /* Resources */,
+			);
+			path = Echo;
+			sourceTree = "<group>";
+		};
+		AA5000032A00000000000003 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AA2000012A00000000000001 /* EchoApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		AA5000042A00000000000004 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				AA2000022A00000000000002 /* Track.swift */,
+				AA2000032A00000000000003 /* Extension.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		AA5000052A00000000000005 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AA2000042A00000000000004 /* AudioPlayerService.swift */,
+				AA2000052A00000000000005 /* ExtensionEngine.swift */,
+				AA2000062A00000000000006 /* OfflineCacheManager.swift */,
+				AA2000072A00000000000007 /* LyricsService.swift */,
+				AA2000082A00000000000008 /* LibraryService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		AA5000062A00000000000006 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AA2000092A00000000000009 /* MainTabView.swift */,
+				AA20000A2A0000000000000A /* MiniPlayerView.swift */,
+				AA20000B2A0000000000000B /* PlayerView.swift */,
+				AA20000C2A0000000000000C /* HomeFeedView.swift */,
+				AA20000D2A0000000000000D /* ExploreSearchView.swift */,
+				AA20000E2A0000000000000E /* LibraryView.swift */,
+				AA20000F2A0000000000000F /* DownloadsView.swift */,
+				AA2000102A00000000000010 /* ExtensionsView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		AA5000072A00000000000007 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AA2000112A00000000000011 /* Assets.xcassets */,
+				AA2000122A00000000000012 /* LaunchScreen.storyboard */,
+				AA2000132A00000000000013 /* Info.plist */,
+				AA2000142A00000000000014 /* Echo.entitlements */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		AA5000082A00000000000008 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AA3000012A00000000000001 /* Echo.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AA6000012A00000000000001 /* Echo */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA7000012A00000000000001 /* Build configuration list for PBXNativeTarget "Echo" */;
+			buildPhases = (
+				AA8000012A00000000000001 /* Sources */,
+				AA4000012A00000000000001 /* Frameworks */,
+				AA9000012A00000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Echo;
+			productName = Echo;
+			productReference = AA3000012A00000000000001 /* Echo.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AA0000012A00000000000001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					AA6000012A00000000000001 = {
+						CreatedOnToolsVersion = 15.0;
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = AA7000022A00000000000002 /* Build configuration list for PBXProject "Echo" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AA5000012A00000000000001;
+			productRefGroup = AA5000082A00000000000008 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AA6000012A00000000000001 /* Echo */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AA9000012A00000000000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA1000112A00000000000011 /* Assets.xcassets in Resources */,
+				AA1000122A00000000000012 /* LaunchScreen.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AA8000012A00000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA1000012A00000000000001 /* EchoApp.swift in Sources */,
+				AA1000022A00000000000002 /* Track.swift in Sources */,
+				AA1000032A00000000000003 /* Extension.swift in Sources */,
+				AA1000042A00000000000004 /* AudioPlayerService.swift in Sources */,
+				AA1000052A00000000000005 /* ExtensionEngine.swift in Sources */,
+				AA1000062A00000000000006 /* OfflineCacheManager.swift in Sources */,
+				AA1000072A00000000000007 /* LyricsService.swift in Sources */,
+				AA1000082A00000000000008 /* LibraryService.swift in Sources */,
+				AA1000092A00000000000009 /* MainTabView.swift in Sources */,
+				AA10000A2A0000000000000A /* MiniPlayerView.swift in Sources */,
+				AA10000B2A0000000000000B /* PlayerView.swift in Sources */,
+				AA10000C2A0000000000000C /* HomeFeedView.swift in Sources */,
+				AA10000D2A0000000000000D /* ExploreSearchView.swift in Sources */,
+				AA10000E2A0000000000000E /* LibraryView.swift in Sources */,
+				AA10000F2A0000000000000F /* DownloadsView.swift in Sources */,
+				AA1000102A00000000000010 /* ExtensionsView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		AA7000032A00000000000003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AA7000042A00000000000004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AA7000052A00000000000005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Echo/Resources/Echo.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Echo/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Echo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.brahmkshatriya.echo.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA7000062A00000000000006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Echo/Resources/Echo.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Echo/Resources/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Echo;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.brahmkshatriya.echo.ios;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AA7000022A00000000000002 /* Build configuration list for PBXProject "Echo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA7000032A00000000000003 /* Debug */,
+				AA7000042A00000000000004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA7000012A00000000000001 /* Build configuration list for PBXNativeTarget "Echo" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA7000052A00000000000005 /* Debug */,
+				AA7000062A00000000000006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = AA0000012A00000000000001 /* Project object */;
+}

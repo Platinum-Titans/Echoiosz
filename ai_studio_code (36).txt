@@ -1,0 +1,47 @@
+import SwiftUI
+
+public struct ExtensionsView: View {
+    @EnvironmentObject var extensionEngine: ExtensionEngine
+    
+    public var body: some View {
+        NavigationView {
+            List(extensionEngine.installedExtensions) { ext in
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack(spacing: 6) {
+                                Text(ext.name)
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.white)
+                                Text("v\(ext.version)")
+                                    .font(.system(size: 10, weight: .bold))
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Capsule().fill(Color.cyan.opacity(0.2)))
+                                    .foregroundColor(.cyan)
+                            }
+                            Text("Provider by \(ext.author)")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                        }
+                        Spacer()
+                        Toggle("", isOn: Binding(
+                            get: { ext.enabled },
+                            set: { _ in extensionEngine.toggleExtension(id: ext.id) }
+                        ))
+                        .toggleStyle(SwitchToggleStyle(tint: .cyan))
+                        .labelsHidden()
+                    }
+                    Text(ext.description)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                }
+                .padding(.vertical, 6)
+                .listRowBackground(Color.clear)
+            }
+            .listStyle(PlainListStyle())
+            .background(Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea())
+            .navigationTitle("Extensions")
+        }
+    }
+}

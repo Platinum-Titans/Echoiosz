@@ -1,0 +1,85 @@
+import Foundation
+import Combine
+
+public class LibraryService: ObservableObject {
+    public static let shared = LibraryService()
+    
+    @Published public var likedTracks: [Track] = []
+    @Published public var playlists: [Playlist] = []
+    @Published public var historyTracks: [Track] = []
+    
+    private let likedKey = "echo_liked_tracks"
+    private let playlistsKey = "echo_playlists"
+    private let historyKey = "echo_history_tracks"
+    
+    private init() {
+        loadData()
+    }
+    
+    private func loadData() {
+        if let data = UserDefaults.standard.data(forKey: likedKey),
+           let tracks = try? JSONDecoder().decode([Track].self, data: data) {
+            self.likedTracks = tracks
+        }
+        if let data = UserDefaults.standard.data(forKey: playlistsKey),
+           let lists = try? JSONDecoder().decode([Playlist].self, data: data) {
+            self.playlists = lists
+        }
+        if let data = UserDefaults.standard.data(forKey: historyKey),
+           let hist = try? JSONDecoder().decode([Track].self, data: data) {
+            self.historyTracks = hist
+        }
+    }
+    
+    private func saveLikes() {
+        if let data = try? JSONEncoder().encode(likedTracks) {
+            UserDefaults.standard.set(data, forKey: likedKey)
+        }
+    }
+    
+    private func savePlaylists() {
+        if let data = try? JSONEncoder().encode(playlists) {
+            UserDefaults.standard.set(data, forKey: playlistsKey)
+        }
+    }
+    
+    private func saveHistory() {
+        if let data = try? JSONEncoder().encode(historyTracks) {
+            UserDefaults.standard.set(data, forKey: historyKey)
+        }
+    }
+    
+    public func toggleLike(track: Track) {
+        if let idx = likedTracks.firstIndex(where: { $0.id == track.id }) {
+            likedTracks.remove(at: idx)
+        } else {
+            likedTracks.insert(track, at: 0)
+        }
+        saveLikes()
+    }
+    
+    public func isLiked(trackId: String) -> Bool {
+        likedTracks.contains(where: { $0.id == trackId })
+    }
+    
+    public func createPlaylist(name: String) {
+        guard !name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        let p = Playlist(name: name)
+        playlists.append(p)
+        savePlaylists()
+    }
+    
+    public func deletePlaylist(id: String) {
+        playlists.removeAll(where: { $0.id == id })
+        savePlaylists()
+    }
+    
+    public func recordHistory(track: Track) {
+        historyTracks.removeAll(where: { $0.id == track.id })
+        historyTracks.insert(track, at: 0)
+        if historyTracks.count > 30 {
+            historyTracks = Array(historyTracks.prefix(30))
+        }
+        saveHistory()
+    }
+}

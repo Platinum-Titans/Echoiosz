@@ -1,0 +1,97 @@
+import SwiftUI
+
+public struct ExploreSearchView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @EnvironmentObject var extensionEngine: ExtensionEngine
+    
+    @State private var query: String = ""
+    @State private var searchResults: [Track] = []
+    @State private var isSearching: Bool = false
+    @State private var searchTask: Task<Void, Never>?
+    
+    public var body: some View {
+        NavigationView {
+            VStack(spacing: 12) {
+                HStack {
+                    Image(systemName: "magnifyingglass").foregroundColor(.gray)
+                    TextField("Search tracks, artists, or audio streams...", text: $query)
+                        .foregroundColor(.white)
+                        .onChange(of: query) { newQuery in
+                            performSearch(query: newQuery)
+                        }
+                    if !query.isEmpty {
+                        Button(action: {
+                            query = ""
+                            performSearch(query: "")
+                        }) {
+                            Image(systemName: "xmark.circle.fill").foregroundColor(.gray)
+                        }
+                    }
+                }
+                .padding(12)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .fill(Color(red: 0.06, green: 0.09, blue: 0.18))
+                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.1), lineWidth: 1))
+                )
+                .padding(.horizontal, 16)
+                
+                if isSearching {
+                    ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .cyan)).padding()
+                }
+                
+                List(searchResults) { track in
+                    HStack(spacing: 12) {
+                        AsyncImage(url: URL(string: track.coverUrl)) { img in
+                            img.resizable().aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            Rectangle().fill(Color.gray.opacity(0.3))
+                        }
+                        .frame(width: 44, height: 44)
+                        .cornerRadius(8)
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(track.title)
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                            Text(track.artistString)
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                                .lineLimit(1)
+                        }
+                        Spacer()
+                        Text(track.formattedDuration)
+                            .font(.system(size: 12, design: .monospaced))
+                            .foregroundColor(.gray)
+                    }
+                    .listRowBackground(Color.clear)
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        audioService.playTrack(track, queue: searchResults)
+                    }
+                }
+                .listStyle(PlainListStyle())
+            }
+            .background(Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea())
+            .navigationTitle("Explore")
+            .onAppear {
+                performSearch(query: query)
+            }
+        }
+    }
+    
+    private func performSearch(query: String) {
+        searchTask?.cancel()
+        searchTask = Task {
+            isSearching = true
+            let tracks = await extensionEngine.searchAcrossProviders(query: query)
+            if !Task.isCancelled {
+                await MainActor.run {
+                    self.searchResults = tracks
+                    self.isSearching = false
+                }
+            }
+        }
+    }
+}

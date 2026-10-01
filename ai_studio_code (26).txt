@@ -1,0 +1,49 @@
+import Foundation
+
+public class LyricsService {
+    public static let shared = LyricsService()
+    
+    private init() {}
+    
+    public func parseLRC(content: String) -> SyncedLyrics {
+        var lines: [LyricLine] = []
+        let rawLines = content.components(separatedBy: .newlines)
+        
+        let pattern = "\\[(\\d{2}):(\\d{2})(?:\\.(\\d{2,3}))?\\](.*)"
+        guard let regex = try? NSRegularExpression(pattern: pattern, options: []) else {
+            return SyncedLyrics(lines: [])
+        }
+        
+        for line in rawLines {
+            let nsString = line as NSString
+            let matches = regex.matches(in: line, options: [], range: NSRange(location: 0, length: nsString.length))
+            for match in matches {
+                guard match.numberOfRanges >= 3 else { continue }
+                let minutes = Double(nsString.substring(with: match.range(at: 1))) ?? 0
+                let seconds = Double(nsString.substring(with: match.range(at: 2))) ?? 0
+                var fraction: Double = 0
+                if match.range(at: 3).location != NSNotFound {
+                    let fracStr = nsString.substring(with: match.range(at: 3))
+                    fraction = (Double(fracStr) ?? 0) / (fracStr.count == 2 ? 100.0 : 1000.0)
+                }
+                let totalMs = Int(((minutes * 60.0) + seconds + fraction) * 1000.0)
+                let text = match.range(at: 4).location != NSNotFound
+                    ? nsString.substring(with: match.range(at: 4)).trimmingCharacters(in: .whitespaces)
+                    : ""
+                if !text.isEmpty {
+                    lines.append(LyricLine(timeMs: totalMs, text: text))
+                }
+            }
+        }
+        lines.sort { $0.timeMs < $1.timeMs }
+        return SyncedLyrics(lines: lines, source: "Parsed LRC")
+    }
+    
+    public func fetchLyrics(for track: Track, completion: @escaping (SyncedLyrics?) -> Void) {
+        if let embedded = track.lyrics {
+            completion(embedded)
+            return
+        }
+        completion(nil)
+    }
+}

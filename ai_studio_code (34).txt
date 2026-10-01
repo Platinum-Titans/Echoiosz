@@ -1,0 +1,187 @@
+import SwiftUI
+
+public struct LibraryView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @EnvironmentObject var libraryService: LibraryService
+    @State private var showingCreatePlaylist = false
+    @State private var newPlaylistTitle = ""
+    
+    public var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 16) {
+                    NavigationLink(destination: PlaylistDetailView(title: "Liked Songs", tracks: libraryService.likedTracks)) {
+                        HStack(spacing: 16) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(LinearGradient(colors: [.cyan, .blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                    .frame(width: 56, height: 56)
+                                Image(systemName: "heart.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.white)
+                            }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Liked Songs")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.white)
+                                Text("\(libraryService.likedTracks.count) tracks saved")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.gray)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right").foregroundColor(.gray)
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(Color(red: 0.06, green: 0.09, blue: 0.18))
+                                .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cyan.opacity(0.2), lineWidth: 1))
+                        )
+                        .padding(.horizontal, 16)
+                    }
+                    
+                    NavigationLink(destination: DownloadsView()) {
+                        HStack(spacing: 16) {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 16)
+                                    .fill(Color.cyan.opacity(0.15))
+                                    .frame(width: 56, height: 56)
+                                Image(systemName: "arrow.down.circle.fill")
+                                    .font(.system(size: 24))
+                                    .foregroundColor(.cyan)
+                            }
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Downloads")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.white)
+                                Text("Offline audio repository")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.gray)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right").foregroundColor(.gray)
+                        }
+                        .padding(16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 18)
+                                .fill(Color(red: 0.06, green: 0.09, blue: 0.18))
+                                .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                        )
+                        .padding(.horizontal, 16)
+                    }
+                    
+                    HStack {
+                        Text("Custom Playlists")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(.white)
+                        Spacer()
+                        Button(action: { showingCreatePlaylist = true }) {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.cyan)
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    
+                    ForEach(libraryService.playlists) { pl in
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(pl.name)
+                                    .font(.system(size: 15, weight: .bold))
+                                    .foregroundColor(.white)
+                                Text("\(pl.trackIds.count) songs")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.gray)
+                            }
+                            Spacer()
+                            Button(action: { libraryService.deletePlaylist(id: pl.id) }) {
+                                Image(systemName: "trash").foregroundColor(.gray)
+                            }
+                        }
+                        .padding(14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14)
+                                .fill(Color(red: 0.06, green: 0.09, blue: 0.18))
+                        )
+                        .padding(.horizontal, 16)
+                    }
+                }
+                .padding(.vertical, 16)
+            }
+            .background(Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea())
+            .navigationTitle("Library")
+            .sheet(isPresented: $showingCreatePlaylist) {
+                NavigationView {
+                    VStack(spacing: 20) {
+                        TextField("Playlist Title", text: $newPlaylistTitle)
+                            .padding()
+                            .background(RoundedRectangle(cornerRadius: 12).fill(Color.gray.opacity(0.2)))
+                            .foregroundColor(.white)
+                        
+                        Button("Create Playlist") {
+                            libraryService.createPlaylist(name: newPlaylistTitle)
+                            newPlaylistTitle = ""
+                            showingCreatePlaylist = false
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.cyan)
+                        
+                        Spacer()
+                    }
+                    .padding()
+                    .navigationTitle("New Playlist")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") { showingCreatePlaylist = false }
+                        }
+                    }
+                }
+                .preferredColorScheme(.dark)
+            }
+        }
+    }
+}
+
+public struct PlaylistDetailView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    let title: String
+    let tracks: [Track]
+    
+    public var body: some View {
+        List(tracks) { track in
+            HStack(spacing: 12) {
+                AsyncImage(url: URL(string: track.coverUrl)) { img in
+                    img.resizable().aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Rectangle().fill(Color.gray.opacity(0.3))
+                }
+                .frame(width: 44, height: 44)
+                .cornerRadius(8)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(track.title)
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    Text(track.artistString)
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                        .lineLimit(1)
+                }
+                Spacer()
+                Text(track.formattedDuration)
+                    .font(.system(size: 12, design: .monospaced))
+                    .foregroundColor(.gray)
+            }
+            .listRowBackground(Color.clear)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                audioService.playTrack(track, queue: tracks)
+            }
+        }
+        .listStyle(PlainListStyle())
+        .background(Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea())
+        .navigationTitle(title)
+    }
+}

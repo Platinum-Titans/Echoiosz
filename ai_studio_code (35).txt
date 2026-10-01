@@ -1,0 +1,99 @@
+import SwiftUI
+
+public struct DownloadsView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @EnvironmentObject var offlineCache: OfflineCacheManager
+    
+    public var body: some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 12) {
+                HStack {
+                    Image(systemName: "internaldrive.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(.cyan)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Local Audio Storage")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(.white)
+                        Text("\(offlineCache.cachedRecords.count) tracks saved for offline playback")
+                            .font(.system(size: 12))
+                            .foregroundColor(.gray)
+                    }
+                    Spacer()
+                    if !offlineCache.cachedRecords.isEmpty {
+                        Button(action: { offlineCache.clearAllDownloads() }) {
+                            Image(systemName: "trash").foregroundColor(.red.opacity(0.8))
+                        }
+                    }
+                }
+            }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color(red: 0.06, green: 0.09, blue: 0.18))
+                    .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.cyan.opacity(0.2), lineWidth: 1))
+            )
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            
+            if offlineCache.cachedRecords.isEmpty {
+                VStack(spacing: 8) {
+                    Spacer()
+                    Image(systemName: "arrow.down.circle")
+                        .font(.system(size: 48))
+                        .foregroundColor(.gray)
+                    Text("No Offline Downloads")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                    Text("Tracks downloaded inside Echo can be played without internet connection.")
+                        .font(.system(size: 12))
+                        .foregroundColor(.gray)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 32)
+                    Spacer()
+                }
+            } else {
+                List {
+                    ForEach(offlineCache.cachedRecords) { record in
+                        HStack(spacing: 12) {
+                            AsyncImage(url: URL(string: record.track.coverUrl)) { img in
+                                img.resizable().aspectRatio(contentMode: .fill)
+                            } placeholder: {
+                                Rectangle().fill(Color.gray.opacity(0.3))
+                            }
+                            .frame(width: 44, height: 44)
+                            .cornerRadius(8)
+                            
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(record.track.title)
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .lineLimit(1)
+                                Text(record.track.artistString)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.gray)
+                                    .lineLimit(1)
+                            }
+                            Spacer()
+                            Image(systemName: "checkmark.circle.fill").foregroundColor(.cyan)
+                        }
+                        .listRowBackground(Color.clear)
+                        .contentShape(Rectangle())
+                        .onTapGesture {
+                            audioService.playTrack(record.track)
+                        }
+                    }
+                    .onDelete { indexSet in
+                        for idx in indexSet {
+                            let item = offlineCache.cachedRecords[idx]
+                            offlineCache.removeCachedTrack(item.track.id)
+                        }
+                    }
+                }
+                .listStyle(PlainListStyle())
+            }
+        }
+        .background(Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea())
+        .navigationTitle("Downloads")
+    }
+}
