@@ -1,0 +1,128 @@
+import Foundation
+
+public struct CachedTrackRecord: Identifiable, Codable, Equatable {
+    public var id: String { track.id }
+    public let track: Track
+    public let localFileName: String
+    public let sizeBytes: Int64
+    public let cachedAt: Date
+}
+
+public class OfflineCacheManager: ObservableObject {
+    public static let shared = OfflineCacheManager()
+    
+    @Published public var cachedRecords: [CachedTrackRecord] = []
+    
+    private let fileManager = FileManager.default
+    private let cacheDirectoryName = "EchoOfflineStore"
+    private var downloadTasks: [String: URLSessionDownloadTask] = [:]
+    
+    private var cacheDirectoryUrl: URL {
+        let docs = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let dir = docs.appendingPathComponent(cacheDirectoryName, isDirectory: true)
+        if !fileManager.fileExists(atPath: dir.path) {
+            try? fileManager.createDirectory(at: dir, withIntermediateDirectories: true)
+        }
+        return dir
+    }
+    
+    private var metadataFileUrl: URL {
+        cacheDirectoryUrl.appendingPathComponent("cached_manifest.json")
+    }
+    
+    private init() {
+        loadMetadata()
+    }
+    
+    private func loadMetadata() {
+        guard fileManager.fileExists(atPath: metadataFileUrl.path),
+              let data = try? Data(contentsOf: metadataFileUrl),
+              let records = try? JSONDecoder().decode([CachedTrackRecord].self, data: data) else {
+            return
+        }
+        self.cachedRecords = records
+    }
+    
+    private func saveMetadata() {
+        if let data = try? JSONEncoder().encode(cachedRecords) {
+            try? data.write(to: metadataFileUrl)
+        }
+    }
+    
+    public func getLocalAudioFileURL(for trackId: String) -> URL? {
+        guard let record = cachedRecords.first(where: { $0.track.id == trackId }) else {
+            return nil
+        }
+        let fileUrl = cacheDirectoryUrl.appendingPathComponent(record.localFileName)
+        return fileManager.fileExists(atPath: fileUrl.path) ? fileUrl : nil
+    }
+    
+    public func isTrackCached(_ trackId: String) -> Bool {
+        getLocalAudioFileURL(for: trackId) != nil
+    }
+    
+    public func downloadTrack(_ track: Track, completion: @escaping (Bool) -> Void) {
+        guard let streamUrlString = track.streamUrl, let url = URL(string: streamUrlString) else {
+            completion(false)
+            return
+        }
+        
+        let sanitized = track.id.replacingOccurrences(of: "/", with: "_")
+        let localFileName = "\(sanitized).mp3"
+        let destinationUrl = cacheDirectoryUrl.appendingPathComponent(localFileName)
+        
+        let task = URLSession.shared.downloadTask(with: url) { [weak self] tempUrl, _, error in
+            guard let self = self, let tempUrl = tempUrl, error == nil else {
+                DispatchQueue.main.async { completion(false) }
+                return
+            }
+            
+            do {
+                if self.fileManager.fileExists(atPath: destinationUrl.path) {
+                    try self.fileManager.removeItem(at: destinationUrl)
+                }
+                try self.fileManager.moveItem(at: tempUrl, to: destinationUrl)
+                let attr = try self.fileManager.attributesOfItem(atPath: destinationUrl.path)
+                let size = (attr[.size] as? Int64) ?? 0
+                
+                let record = CachedTrackRecord(
+                    track: track,
+                    localFileName: localFileName,
+                    sizeBytes: size,
+                    cachedAt: Date()
+                )
+                
+                DispatchQueue.main.async {
+                    self.cachedRecords.removeAll(where: { $0.track.id == track.id })
+                    self.cachedRecords.append(record)
+                    self.saveMetadata()
+                    self.downloadTasks.removeValue(forKey: track.id)
+                    completion(true)
+                }
+            } catch {
+                DispatchQueue.main.async { completion(false) }
+            }
+        }
+        downloadTasks[track.id] = task
+        task.resume()
+    }
+    
+    public func removeCachedTrack(_ trackId: String) {
+        if let idx = cachedRecords.firstIndex(where: { $0.track.id == trackId }) {
+            let record = cachedRecords[idx]
+            let fileUrl = cacheDirectoryUrl.appendingPathComponent(record.localFileName)
+            try? fileManager.removeItem(at: fileUrl)
+            cachedRecords.remove(at: idx)
+            saveMetadata()
+        }
+    }
+    
+    public func clearAllDownloads() {
+        for record in cachedRecords {
+            let fileUrl = cacheDirectoryUrl.appendingPathComponent(record.localFileName)
+            try? fileManager.removeItem(at: fileUrl)
+        }
+        cachedRecords.removeAll()
+        saveMetadata()
+    }
+}

@@ -1,0 +1,39 @@
+Echo/
+├── App/
+│   └── EchoApp.swift
+├── Models/
+│   ├── Track.swift
+│   └── Extension.swift
+├── Services/
+│   ├── AudioPlayerService.swift
+│   ├── ExtensionEngine.swift
+│   ├── LyricsService.swift
+│   ├── OfflineCacheManager.swift
+│   └── LibraryService.swift
+├── Views/
+│   ├── MainTabView.swift
+│   ├── MiniPlayerView.swift
+│   ├── PlayerView.swift
+│   ├── HomeFeedView.swift
+│   ├── ExploreSearchView.swift
+│   ├── LibraryView.swift
+│   ├── DownloadsView.swift
+│   └── ExtensionsView.swift
+└── Resources/
+    ├── Info.plist
+    ├── Echo.entitlements
+    ├── LaunchScreen.storyboard
+    └── Assets.xcassets/
+        ├── AppIcon.appiconset/
+        │   ├── Contents.json
+        │   ├── AppIcon-20@2x.png
+        │   ├── AppIcon-20@3x.png
+        │   ├── AppIcon-29@2x.png
+        │   ├── AppIcon-29@3x.png
+        │   ├── AppIcon-40@2x.png
+        │   ├── AppIcon-40@3x.png
+        │   ├── AppIcon-60@2x.png
+        │   ├── AppIcon-60@3x.png
+        │   └── AppIcon-1024.png
+        └── AccentColor.colorset/
+            └── Contents.json

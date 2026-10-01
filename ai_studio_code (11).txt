@@ -1,0 +1,261 @@
+import SwiftUI
+import MediaPlayer
+import AVKit
+
+public struct PlayerView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @EnvironmentObject var offlineCache: OfflineCacheManager
+    @EnvironmentObject var libraryService: LibraryService
+    @Binding var isPresented: Bool
+    
+    @State private var activeTab = 0
+    @State private var isDownloading = false
+    
+    public var body: some View {
+        ZStack {
+            Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea()
+            
+            RadialGradient(
+                gradient: Gradient(colors: [Color.cyan.opacity(0.12), Color.clear]),
+                center: .topLeading,
+                startRadius: 20,
+                endRadius: 350
+            ).ignoresSafeArea()
+            
+            RadialGradient(
+                gradient: Gradient(colors: [Color.purple.opacity(0.12), Color.clear]),
+                center: .bottomTrailing,
+                startRadius: 20,
+                endRadius: 400
+            ).ignoresSafeArea()
+            
+            if let track = audioService.currentTrack {
+                VStack(spacing: 16) {
+                    HStack {
+                        Button(action: { isPresented = false }) {
+                            Image(systemName: "chevron.down")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(8)
+                        }
+                        Spacer()
+                        Text("ECHO AUDIO PLAYER")
+                            .font(.system(size: 11, weight: .heavy))
+                            .foregroundColor(.cyan)
+                        Spacer()
+                        AirPlayView().frame(width: 32, height: 32)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    
+                    Spacer()
+                    
+                    if activeTab == 1, let lyrics = track.lyrics, !lyrics.lines.isEmpty {
+                        ScrollViewReader { proxy in
+                            ScrollView(showsIndicators: false) {
+                                VStack(spacing: 20) {
+                                    ForEach(Array(lyrics.lines.enumerated()), id: \.offset) { idx, line in
+                                        let isActive = idx == audioService.activeLyricIndex
+                                        Text(line.text)
+                                            .font(.system(size: isActive ? 22 : 16, weight: isActive ? .heavy : .medium))
+                                            .foregroundColor(isActive ? .cyan : .gray)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.horizontal, 20)
+                                            .scaleEffect(isActive ? 1.05 : 1.0)
+                                            .animation(.easeInOut(duration: 0.25), value: isActive)
+                                            .id(idx)
+                                            .onTapGesture {
+                                                audioService.seek(to: line.timeSeconds)
+                                            }
+                                    }
+                                }
+                                .padding(.vertical, 40)
+                            }
+                            .onChange(of: audioService.activeLyricIndex) { newIndex in
+                                withAnimation { proxy.scrollTo(newIndex, anchor: .center) }
+                            }
+                        }
+                        .frame(maxHeight: 300)
+                    } else {
+                        AsyncImage(url: URL(string: track.coverUrl)) { image in
+                            image.resizable().aspectRatio(contentMode: .fill)
+                        } placeholder: {
+                            RoundedRectangle(cornerRadius: 24).fill(Color.gray.opacity(0.3))
+                        }
+                        .frame(width: 270, height: 270)
+                        .cornerRadius(24)
+                        .overlay(RoundedRectangle(cornerRadius: 24).stroke(Color.cyan.opacity(0.25), lineWidth: 1))
+                        .shadow(color: Color.cyan.opacity(0.25), radius: 25, y: 10)
+                    }
+                    
+                    SwiftUIAudioVisualizer(isPlaying: audioService.isPlaying)
+                        .frame(height: 32)
+                        .padding(.horizontal, 24)
+                    
+                    Spacer()
+                    
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(track.title)
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white)
+                                .lineLimit(1)
+                            Text(track.artistString)
+                                .font(.system(size: 15))
+                                .foregroundColor(.gray)
+                                .lineLimit(1)
+                        }
+                        Spacer()
+                        
+                        Button(action: { libraryService.toggleLike(track: track) }) {
+                            Image(systemName: libraryService.isLiked(trackId: track.id) ? "heart.fill" : "heart")
+                                .font(.system(size: 22))
+                                .foregroundColor(libraryService.isLiked(trackId: track.id) ? .cyan : .gray)
+                        }
+                        .padding(6)
+                        
+                        Button(action: {
+                            if offlineCache.isTrackCached(track.id) {
+                                offlineCache.removeCachedTrack(track.id)
+                            } else {
+                                isDownloading = true
+                                offlineCache.downloadTrack(track) { _ in isDownloading = false }
+                            }
+                        }) {
+                            if isDownloading {
+                                ProgressView().progressViewStyle(CircularProgressViewStyle(tint: .cyan))
+                            } else if offlineCache.isTrackCached(track.id) {
+                                Image(systemName: "checkmark.circle.fill").foregroundColor(.cyan).font(.system(size: 22))
+                            } else {
+                                Image(systemName: "arrow.down.circle").foregroundColor(.gray).font(.system(size: 22))
+                            }
+                        }
+                        .padding(6)
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    VStack(spacing: 6) {
+                        Slider(
+                            value: Binding(
+                                get: { audioService.currentTime },
+                                set: { audioService.seek(to: $0) }
+                            ),
+                            in: 0...max(audioService.duration, 1.0)
+                        )
+                        .accentColor(.cyan)
+                        
+                        HStack {
+                            Text(formatTime(audioService.currentTime))
+                                .font(.system(size: 12, design: .monospaced))
+                                .foregroundColor(.cyan)
+                            Spacer()
+                            Text(formatTime(audioService.duration))
+                                .font(.system(size: 12, design: .monospaced))
+                                .foregroundColor(.gray)
+                        }
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    HStack(spacing: 32) {
+                        Button(action: { audioService.toggleShuffle() }) {
+                            Image(systemName: "shuffle")
+                                .font(.system(size: 18))
+                                .foregroundColor(audioService.shuffle ? .cyan : .gray)
+                        }
+                        Button(action: { audioService.playPrevious() }) {
+                            Image(systemName: "backward.fill")
+                                .font(.system(size: 26))
+                                .foregroundColor(.white)
+                        }
+                        Button(action: { audioService.togglePlayPause() }) {
+                            ZStack {
+                                Circle()
+                                    .fill(LinearGradient(
+                                        colors: [Color(red: 0.0, green: 0.82, blue: 1.0), Color(red: 0.15, green: 0.39, blue: 0.92), Color(red: 0.58, green: 0.36, blue: 0.96)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ))
+                                    .frame(width: 68, height: 68)
+                                    .shadow(color: Color.cyan.opacity(0.45), radius: 16)
+                                Image(systemName: audioService.isPlaying ? "pause.fill" : "play.fill")
+                                    .font(.system(size: 28))
+                                    .foregroundColor(.white)
+                            }
+                        }
+                        Button(action: { audioService.playNext() }) {
+                            Image(systemName: "forward.fill")
+                                .font(.system(size: 26))
+                                .foregroundColor(.white)
+                        }
+                        Button(action: { audioService.cycleRepeatMode() }) {
+                            Image(systemName: audioService.repeatMode == .one ? "repeat.1" : "repeat")
+                                .font(.system(size: 18))
+                                .foregroundColor(audioService.repeatMode != .off ? .purple : .gray)
+                        }
+                    }
+                    .padding(.vertical, 8)
+                    
+                    HStack(spacing: 40) {
+                        Button(action: { activeTab = 0 }) {
+                            Text("Artwork")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(activeTab == 0 ? .cyan : .gray)
+                        }
+                        Button(action: { activeTab = 1 }) {
+                            Text("Lyrics")
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(activeTab == 1 ? .cyan : .gray)
+                        }
+                    }
+                    .padding(.bottom, 16)
+                }
+            }
+        }
+    }
+    
+    private func formatTime(_ seconds: TimeInterval) -> String {
+        let mins = Int(seconds) / 60
+        let secs = Int(seconds) % 60
+        return String(format: "%d:%02d", mins, secs)
+    }
+}
+
+public struct SwiftUIAudioVisualizer: View {
+    let isPlaying: Bool
+    @State private var phase: CGFloat = 0
+    
+    public var body: some View {
+        HStack(spacing: 3) {
+            ForEach(0..<28, id: \.self) { i in
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(LinearGradient(
+                        colors: [Color(red: 0.0, green: 0.82, blue: 1.0), Color(red: 0.15, green: 0.39, blue: 0.92), Color(red: 0.58, green: 0.36, blue: 0.96)],
+                        startPoint: .bottom,
+                        endPoint: .top
+                    ))
+                    .frame(height: isPlaying ? max(4, CGFloat(sin(Double(i) * 0.4 + Double(phase)) * 12 + 16)) : 4)
+                    .animation(isPlaying ? Animation.easeInOut(duration: 0.2).repeatForever(autoreverses: true).delay(Double(i) * 0.03) : .default, value: phase)
+            }
+        }
+        .padding(.vertical, 4)
+        .padding(.horizontal, 8)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(red: 0.04, green: 0.07, blue: 0.14).opacity(0.7))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.cyan.opacity(0.15), lineWidth: 1))
+        )
+        .onAppear {
+            if isPlaying { phase = 10 }
+        }
+    }
+}
+
+public struct AirPlayView: UIViewRepresentable {
+    public func makeUIView(context: Context) -> AVRoutePickerView {
+        let picker = AVRoutePickerView()
+        picker.tintColor = .white
+        picker.activeTintColor = .cyan
+        return picker
+    }
+    public func updateUIView(_ uiView: AVRoutePickerView, context: Context) {}
+}

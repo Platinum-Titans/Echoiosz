@@ -1,0 +1,83 @@
+import SwiftUI
+import AVFoundation
+import MediaPlayer
+
+@main
+struct EchoApp: App {
+    @StateObject private var audioService = AudioPlayerService.shared
+    @StateObject private var extensionEngine = ExtensionEngine.shared
+    @StateObject private var offlineCache = OfflineCacheManager.shared
+    @StateObject private var libraryService = LibraryService.shared
+    
+    init() {
+        configureAudioSession()
+        configureRemoteCommandCenter()
+    }
+    
+    var body: some Scene {
+        WindowGroup {
+            MainTabView()
+                .environmentObject(audioService)
+                .environmentObject(extensionEngine)
+                .environmentObject(offlineCache)
+                .environmentObject(libraryService)
+                .preferredColorScheme(.dark)
+                .onAppear {
+                    audioService.setupNowPlaying()
+                }
+        }
+    }
+    
+    private func configureAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, options: [.allowAirPlay, .allowBluetooth, .allowBluetoothA2DP])
+            try session.setActive(true)
+        } catch {
+            print("[EchoApp] Failed to set AVAudioSession category: \(error.localizedDescription)")
+        }
+    }
+    
+    private func configureRemoteCommandCenter() {
+        let commandCenter = MPRemoteCommandCenter.shared()
+        
+        commandCenter.playCommand.removeTarget(nil)
+        commandCenter.playCommand.addTarget { _ in
+            AudioPlayerService.shared.play()
+            return .success
+        }
+        
+        commandCenter.pauseCommand.removeTarget(nil)
+        commandCenter.pauseCommand.addTarget { _ in
+            AudioPlayerService.shared.pause()
+            return .success
+        }
+        
+        commandCenter.togglePlayPauseCommand.removeTarget(nil)
+        commandCenter.togglePlayPauseCommand.addTarget { _ in
+            AudioPlayerService.shared.togglePlayPause()
+            return .success
+        }
+        
+        commandCenter.nextTrackCommand.removeTarget(nil)
+        commandCenter.nextTrackCommand.addTarget { _ in
+            AudioPlayerService.shared.playNext()
+            return .success
+        }
+        
+        commandCenter.previousTrackCommand.removeTarget(nil)
+        commandCenter.previousTrackCommand.addTarget { _ in
+            AudioPlayerService.shared.playPrevious()
+            return .success
+        }
+        
+        commandCenter.changePlaybackPositionCommand.removeTarget(nil)
+        commandCenter.changePlaybackPositionCommand.addTarget { event in
+            guard let positionEvent = event as? MPChangePlaybackPositionCommandEvent else {
+                return .commandFailed
+            }
+            AudioPlayerService.shared.seek(to: positionEvent.positionTime)
+            return .success
+        }
+    }
+}

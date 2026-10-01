@@ -1,0 +1,40 @@
+import Foundation
+
+public struct EchoExtension: Identifiable, Codable, Equatable {
+    public let id: String
+    public let name: String
+    public let version: String
+    public let author: String
+    public let description: String
+    public let iconUrl: String?
+    public var enabled: Bool
+    public let capabilities: [String]
+    
+    public init(
+        id: String,
+        name: String,
+        version: String,
+        author: String,
+        description: String,
+        iconUrl: String? = nil,
+        enabled: Bool = true,
+        capabilities: [String] = ["search", "stream", "lyrics", "shelves"]
+    ) {
+        self.id = id
+        self.name = name
+        self.version = version
+        self.author = author
+        self.description = description
+        self.iconUrl = iconUrl
+        self.enabled = enabled
+        self.capabilities = capabilities
+    }
+}
+
+public protocol ExtensionProvider {
+    var manifest: EchoExtension { get }
+    func searchTracks(query: String) async throws -> [Track]
+    func fetchShelves() async throws -> [Shelf]
+    func resolveStreamUrl(for track: Track) async throws -> URL?
+    func fetchLyrics(for track: Track) async throws -> SyncedLyrics?
+}

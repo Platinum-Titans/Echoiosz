@@ -1,0 +1,112 @@
+import SwiftUI
+
+public struct HomeFeedView: View {
+    @EnvironmentObject var audioService: AudioPlayerService
+    @EnvironmentObject var extensionEngine: ExtensionEngine
+    
+    @State private var shelves: [Shelf] = []
+    @State private var isLoading: Bool = false
+    
+    public var body: some View {
+        NavigationView {
+            ScrollView {
+                VStack(spacing: 24) {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("ECHO MUSIC • QUICK PICK")
+                                    .font(.system(size: 10, weight: .heavy))
+                                    .foregroundStyle(
+                                        LinearGradient(colors: [.cyan, .purple], startPoint: .leading, endPoint: .trailing)
+                                    )
+                                Text("Start your personalized radio")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(.white)
+                                Text("Instant audio streaming powered by Echo extensions")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.gray)
+                            }
+                            Spacer()
+                            Button(action: {
+                                if let firstTrack = shelves.first?.tracks.first {
+                                    audioService.playTrack(firstTrack, queue: shelves.first?.tracks)
+                                }
+                            }) {
+                                ZStack {
+                                    Circle()
+                                        .fill(LinearGradient(colors: [.cyan, .blue, .purple], startPoint: .topLeading, endPoint: .bottomTrailing))
+                                        .frame(width: 48, height: 48)
+                                    Image(systemName: "play.fill")
+                                        .foregroundColor(.white)
+                                        .font(.system(size: 18))
+                                }
+                            }
+                        }
+                    }
+                    .padding(16)
+                    .background(
+                        RoundedRectangle(cornerRadius: 18)
+                            .fill(Color(red: 0.05, green: 0.08, blue: 0.16).opacity(0.9))
+                            .overlay(RoundedRectangle(cornerRadius: 18).stroke(Color.cyan.opacity(0.2), lineWidth: 1))
+                    )
+                    .padding(.horizontal, 16)
+                    
+                    ForEach(shelves) { shelf in
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text(shelf.title)
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 16)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 14) {
+                                    ForEach(shelf.tracks) { track in
+                                        VStack(alignment: .leading, spacing: 6) {
+                                            AsyncImage(url: URL(string: track.coverUrl)) { img in
+                                                img.resizable().aspectRatio(contentMode: .fill)
+                                            } placeholder: {
+                                                RoundedRectangle(cornerRadius: 12).fill(Color.gray.opacity(0.3))
+                                            }
+                                            .frame(width: 140, height: 140)
+                                            .cornerRadius(12)
+                                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.white.opacity(0.08), lineWidth: 1))
+                                            
+                                            Text(track.title)
+                                                .font(.system(size: 13, weight: .bold))
+                                                .foregroundColor(.white)
+                                                .lineLimit(1)
+                                            Text(track.artistString)
+                                                .font(.system(size: 11))
+                                                .foregroundColor(.gray)
+                                                .lineLimit(1)
+                                        }
+                                        .frame(width: 140)
+                                        .onTapGesture {
+                                            audioService.playTrack(track, queue: shelf.tracks)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                            }
+                        }
+                    }
+                }
+                .padding(.vertical, 16)
+            }
+            .background(Color(red: 0.02, green: 0.03, blue: 0.08).ignoresSafeArea())
+            .navigationTitle("Echo Music")
+            .onAppear {
+                loadShelves()
+            }
+        }
+    }
+    
+    private func loadShelves() {
+        Task {
+            let loaded = await extensionEngine.fetchAllShelves()
+            await MainActor.run {
+                self.shelves = loaded
+            }
+        }
+    }
+}

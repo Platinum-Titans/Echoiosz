@@ -1,0 +1,147 @@
+import Foundation
+
+public class MockLocalExtensionProvider: ExtensionProvider {
+    public var manifest: EchoExtension {
+        EchoExtension(
+            id: "local-mock",
+            name: "Echo Ambient Showcase",
+            version: "1.0.0",
+            author: "Echo Team",
+            description: "Bundled royalty-free sample audio tracks and radio streams for immediate offline & online testing.",
+            enabled: true,
+            capabilities: ["search", "stream", "shelves", "lyrics"]
+        )
+    }
+    
+    private let sampleTracks: [Track] = [
+        Track(
+            id: "echo-ambient-1",
+            title: "Cyber Horizon",
+            artists: ["Echo Synthesis"],
+            album: "Digital Horizons",
+            duration: 184,
+            coverUrl: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=500&q=80",
+            streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            extensionId: "local-mock",
+            lyrics: SyncedLyrics(lines: [
+                LyricLine(timeMs: 0, text: "Fading into neon dreams"),
+                LyricLine(timeMs: 15000, text: "Signals crossing electric streams"),
+                LyricLine(timeMs: 32000, text: "Echoes in the endless night"),
+                LyricLine(timeMs: 52000, text: "Guiding through the purple light")
+            ], source: "Echo Local Synced")
+        ),
+        Track(
+            id: "echo-ambient-2",
+            title: "Solar Flare Beat",
+            artists: ["Aura Pulse", "Echo Studio"],
+            album: "Solar Vibrations",
+            duration: 215,
+            coverUrl: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=500&q=80",
+            streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+            extensionId: "local-mock",
+            lyrics: SyncedLyrics(lines: [
+                LyricLine(timeMs: 0, text: "Drifting through orbit high"),
+                LyricLine(timeMs: 20000, text: "Looking at the starlit sky"),
+                LyricLine(timeMs: 45000, text: "Pulse of sound, clear and bright")
+            ], source: "Echo Local Synced")
+        ),
+        Track(
+            id: "echo-ambient-3",
+            title: "Luminescence",
+            artists: ["Velvet Sound"],
+            album: "Deep Chill 2026",
+            duration: 198,
+            coverUrl: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&q=80",
+            streamUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+            extensionId: "local-mock"
+        )
+    ]
+    
+    public func searchTracks(query: String) async throws -> [Track] {
+        if query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            return sampleTracks
+        }
+        let lower = query.lowercased()
+        return sampleTracks.filter {
+            $0.title.lowercased().contains(lower) || $0.artistString.lowercased().contains(lower)
+        }
+    }
+    
+    public func fetchShelves() async throws -> [Shelf] {
+        [
+            Shelf(id: "shelf-trending", title: "Trending in Echo", subtitle: "Curated for you", tracks: sampleTracks),
+            Shelf(id: "shelf-chill", title: "Late Night Chill", subtitle: "Relaxing ambient audio", tracks: sampleTracks.reversed())
+        ]
+    }
+    
+    public func resolveStreamUrl(for track: Track) async throws -> URL? {
+        if let stream = track.streamUrl, let url = URL(string: stream) {
+            return url
+        }
+        return URL(string: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3")
+    }
+    
+    public func fetchLyrics(for track: Track) async throws -> SyncedLyrics? {
+        track.lyrics
+    }
+}
+
+public class ExtensionEngine: NSObject, ObservableObject {
+    public static let shared = ExtensionEngine()
+    
+    @Published public var installedExtensions: [EchoExtension] = []
+    private var providers: [String: ExtensionProvider] = [:]
+    
+    override private init() {
+        super.init()
+        registerProvider(MockLocalExtensionProvider())
+    }
+    
+    public func registerProvider(_ provider: ExtensionProvider) {
+        let manifest = provider.manifest
+        providers[manifest.id] = provider
+        if !installedExtensions.contains(where: { $0.id == manifest.id }) {
+            installedExtensions.append(manifest)
+        }
+    }
+    
+    public func toggleExtension(id: String) {
+        if let idx = installedExtensions.firstIndex(where: { $0.id == id }) {
+            installedExtensions[idx].enabled.toggle()
+        }
+    }
+    
+    public func searchAcrossProviders(query: String) async -> [Track] {
+        var results: [Track] = []
+        for ext in installedExtensions where ext.enabled {
+            if let provider = providers[ext.id] {
+                if let tracks = try? await provider.searchTracks(query: query) {
+                    results.append(contentsOf: tracks)
+                }
+            }
+        }
+        return results
+    }
+    
+    public func fetchAllShelves() async -> [Shelf] {
+        var shelves: [Shelf] = []
+        for ext in installedExtensions where ext.enabled {
+            if let provider = providers[ext.id] {
+                if let s = try? await provider.fetchShelves() {
+                    shelves.append(contentsOf: s)
+                }
+            }
+        }
+        return shelves
+    }
+    
+    public func resolveStreamUrl(for track: Track) async -> URL? {
+        if let provider = providers[track.extensionId] {
+            return try? await provider.resolveStreamUrl(for: track)
+        }
+        if let first = providers.values.first {
+            return try? await first.resolveStreamUrl(for: track)
+        }
+        return nil
+    }
+}
